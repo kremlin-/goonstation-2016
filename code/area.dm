@@ -1513,6 +1513,9 @@
 /area/station/engine/hotloop
 	name = "Hot Loop"
 	icon_state = "red"
+/area/station/engine/combustion_chamber
+	name = "Combustion Chamber"
+	icon_state = "combustion_chamber"
 
 /area/station/engine/coldloop
 	name = "Cold Loop"
