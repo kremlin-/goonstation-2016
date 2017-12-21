@@ -38,7 +38,8 @@
 	var/list/chamber_samples_avg[] = new/list()
 	var/list/meter_samples[] = new/list()
 	var/list/teg_sample[] = new/list()
-	var/hold = 1 
+	var/hold = 1
+	var/refresh = 1
 	var/luser
 
 	var/curpage = 1 /*1: reactor 2: combustion chamber 3: gas loops */
@@ -97,7 +98,8 @@
 		for(var/M in meter_samples)
 			process_meter(M["tag"], M)
 
-		src.updateUsrDialog()
+		if(refresh)
+			src.updateUsrDialog()
 
 	proc
 		first()
@@ -114,13 +116,13 @@
 
 			/* initialize average lists */
 			avg_chamber["cnt"] = 0
-			for(var/X as text in avg_chamber_words)
+			for(var/X in avg_chamber_words)
 				avg_chamber["[X]"] = 0
 				avg_chamber["[X]_dx"] = 0
 				avg_chamber["[X]_d2x"] = 0
 
 			avg_teg["cnt"] = 0
-			for(var/Y as text in avg_teg_words)
+			for(var/Y in avg_teg_words)
 				avg_teg["[Y]"] = 0
 				avg_teg["[Y]_dx"] = 0
 				avg_teg["[Y]_d2x"] = 0
@@ -129,7 +131,7 @@
 				var/N = T.tag
 				avg_meter["[N]"] = new/list()
 				avg_meter["[N]"]["cnt"] = 0
-				for(var/Z as text in avg_meter_words)
+				for(var/Z in avg_meter_words)
 					avg_meter["[N]"]["[Z]"] = 0
 					avg_meter["[N]"]["[Z]_dx"] = 0
 					avg_meter["[N]"]["[Z]_d2x"] = 0
@@ -159,21 +161,21 @@
 			avg_teg["output"] += L["output"]
 			avg_teg["output_dx"] += g_metric["output_dx"]
 
-			avg_teg["hot_temp_in"] += L["hot_temp_in"] 
-			avg_teg["hot_temp_in_dx"] += g_metric["hot_temp_in_dx"] 
-			avg_teg["hot_temp_out"] += L["hot_temp_out"] 
-			avg_teg["hot_temp_out_dx"] += g_metric["hot_temp_out_dx"] 
-			avg_teg["hot_pressure_in"] += L["hot_pressure_in"] 
-			avg_teg["hot_pressure_in_dx"] += g_metric["hot_pressure_in_dx"] 
-			avg_teg["hot_pressure_out"] += L["hot_pressure_out"] 
-			avg_teg["hot_pressure_out_dx"] += g_metric["hot_pressure_out_dx"] 
+			avg_teg["hot_temp_in"] += L["hot_temp_in"]
+			avg_teg["hot_temp_in_dx"] += g_metric["hot_temp_in_dx"]
+			avg_teg["hot_temp_out"] += L["hot_temp_out"]
+			avg_teg["hot_temp_out_dx"] += g_metric["hot_temp_out_dx"]
+			avg_teg["hot_pressure_in"] += L["hot_pressure_in"]
+			avg_teg["hot_pressure_in_dx"] += g_metric["hot_pressure_in_dx"]
+			avg_teg["hot_pressure_out"] += L["hot_pressure_out"]
+			avg_teg["hot_pressure_out_dx"] += g_metric["hot_pressure_out_dx"]
 
-			avg_teg["cold_temp_in"] += L["cold_temp_in"] 
-			avg_teg["cold_temp_in_dx"] += g_metric["cold_temp_in_dx"] 
-			avg_teg["cold_temp_out"] += L["cold_temp_out"] 
-			avg_teg["cold_temp_out_dx"] += g_metric["cold_temp_out_dx"] 
-			avg_teg["cold_pressure_in"] += L["cold_pressure_in"] 
-			avg_teg["cold_pressure_in_dx"] += g_metric["cold_pressure_in_dx"] 
+			avg_teg["cold_temp_in"] += L["cold_temp_in"]
+			avg_teg["cold_temp_in_dx"] += g_metric["cold_temp_in_dx"]
+			avg_teg["cold_temp_out"] += L["cold_temp_out"]
+			avg_teg["cold_temp_out_dx"] += g_metric["cold_temp_out_dx"]
+			avg_teg["cold_pressure_in"] += L["cold_pressure_in"]
+			avg_teg["cold_pressure_in_dx"] += g_metric["cold_pressure_in_dx"]
 			avg_teg["cold_pressure_out"] += L["cold_pressure_out"]
 			avg_teg["cold_pressure_out_dx"] += g_metric["cold_pressure_out_dx"]
 
@@ -370,7 +372,7 @@
 			avg_chamber["toxins_d2x"] += c_metric["toxins_d2x"]
 			avg_chamber["co2_d2x"] += c_metric["co2_d2x"]
 			avg_chamber["n2_d2x"] += c_metric["n2_d2x"]
-			avg_chamber["pressure_d2x"] += c_metric["pressure_d2x"] 
+			avg_chamber["pressure_d2x"] += c_metric["pressure_d2x"]
 			avg_chamber["temp_d2x"] += c_metric["temp_d2x"]
 			avg_chamber["burnt_d2x"] += c_metric["burnt_d2x"]
 			avg_chamber["heat_capacity_d2x"] += c_metric["heat_capacity_d2x"]
@@ -480,7 +482,7 @@
 			avg_meter["[p_tag]"]["toxins_d2x"] = m_metric["toxins_d2x"]
 			avg_meter["[p_tag]"]["co2_d2x"] = m_metric["co2_d2x"]
 			avg_meter["[p_tag]"]["n2_d2x"] = m_metric["n2_d2x"]
-			avg_meter["[p_tag]"]["pressure_d2x"] = m_metric["pressure_d2x"] 
+			avg_meter["[p_tag]"]["pressure_d2x"] = m_metric["pressure_d2x"]
 			avg_meter["[p_tag]"]["temp_d2x"] = m_metric["temp_d2x"]
 			avg_meter["[p_tag]"]["burnt_d2x"] = m_metric["burnt_d2x"]
 			avg_meter["[p_tag]"]["heat_capacity_d2x"] = m_metric["heat_capacity_d2x"]
@@ -504,7 +506,7 @@
 
 				ret["pressure"] = G.return_pressure()
 				ret["temp"] = G.temperature
-				ret["burnt"] = G.fuel_burnt 
+				ret["burnt"] = G.fuel_burnt
 				ret["heat_capacity"] = G.heat_capacity()
 				ret["thermal_energy"] = G.thermal_energy()
 				ret["moles"] = G.total_moles()
@@ -746,13 +748,13 @@
 			hold = 1
 
 			avg_chamber["cnt"] = 0
-			for(var/X as text in avg_chamber_words)
+			for(var/X in avg_chamber_words)
 				avg_chamber["[X]"] = 0
 				avg_chamber["[X]_dx"] = 0
 				avg_chamber["[X]_d2x"] = 0
 
 			avg_teg["cnt"] = 0
-			for(var/Y as text in avg_teg_words)
+			for(var/Y in avg_teg_words)
 				avg_teg["[Y]"] = 0
 				avg_teg["[Y]_dx"] = 0
 				avg_teg["[Y]_d2x"] = 0
@@ -761,7 +763,7 @@
 				var/N = T.tag
 				avg_meter["[N]"] = new/list()
 				avg_meter["[N]"]["cnt"] = 0
-				for(var/Z as text in avg_meter_words)
+				for(var/Z in avg_meter_words)
 					avg_meter["[N]"]["[Z]"] = 0
 					avg_meter["[N]"]["[Z]_dx"] = 0
 					avg_meter["[N]"]["[Z]_d2x"] = 0
@@ -819,9 +821,15 @@
 			var/ret = {"<div style="margin:30px auto 70px auto;clear:both;width:45%;">
 
 			<div style="display:inline-block;float:left">[status]</div>
-			<div style="display:inline-block;float:right"><a href="?src=\ref[src];avg_reset=1">RESET AVG</a></div>
+			<div style="display:inline-block;float:right">
+			<a href="?src=\ref[src];avg_reset=1">RESET AVG    </a>"}
 
-			</div>"}
+			if(refresh)
+				ret += {"<a href="?src=\ref[src];refresh_toggle=1"><span class="online">REFRESH ON</span></a>"}
+			else
+				ret += {"<a href="?src=\ref[src];refresh_toggle=1"><span class="offline">REFRESH OFF</span></a>"}
+
+			ret += {"</div></div>"}
 
 			return ret
 		gen_reactor_page()
@@ -831,9 +839,9 @@
 			var/list/avg = new/list()
 
 			if(avg_cum)
-				// XXX 
+				// XXX
 			else
-				for(var/N as text in avg_teg_words)
+				for(var/N in avg_teg_words)
 					/*for(var/X in master_generator_datapoints)
 						avg["[N]"] += X["[N]"]
 					for(var/Y in generator_metrics)
@@ -841,7 +849,7 @@
 					for(var/Z in generator_metrics)
 						avg["[N]_d2x"] += Z["[N]_d2x"] */
 
-					avg["[N]"] = (avg_teg["[N]"] ? avg_teg["[N]"] / avg_teg["cnt"] : 0) 
+					avg["[N]"] = (avg_teg["[N]"] ? avg_teg["[N]"] / avg_teg["cnt"] : 0)
 					avg["[N]_dx"] = (avg_teg["[N]_dx"] ? avg_teg["[N]_dx"] / avg_teg["cnt"] : 0)
 					avg["[N]_d2x"] = (avg_teg["[N]_d2x"] ? avg_teg["[N]_d2x"] / (avg_teg["cnt"] - 1) : 0)
 
@@ -989,9 +997,9 @@
 			var/list/avg = new/list()
 
 			if(avg_cum)
-				// XXX 
+				// XXX
 			else
-				for(var/N as text in avg_chamber_words)
+				for(var/N in avg_chamber_words)
 					avg["[N]"] = (avg_chamber["[N]"] ? (avg_chamber["[N]"] / avg_chamber["cnt"]) : 0)
 					avg["[N]_dx"] = (avg_chamber["[N]_dx"] ? (avg_chamber["[N]_dx"] / avg_chamber["cnt"]) : 0)
 					avg["[N]_d2x"] = (avg_chamber["[N]_d2x"] ? (avg_chamber["[N]_d2x"] / (avg_chamber["cnt"] - 1)) : 0)
@@ -1299,10 +1307,10 @@
 			var/list/avg = new/list()
 
 			if(avg_cum)
-				// XXX 
+				// XXX
 			else
-				for(var/N as text in avg_meter_words)
-					avg["[N]"] = (avg_meter["[p_tag]"]["[N]"] ? avg_meter["[p_tag]"]["[N]"] / avg_meter["[p_tag]"]["cnt"] : 0) 
+				for(var/N in avg_meter_words)
+					avg["[N]"] = (avg_meter["[p_tag]"]["[N]"] ? avg_meter["[p_tag]"]["[N]"] / avg_meter["[p_tag]"]["cnt"] : 0)
 					avg["[N]_dx"] = (avg_meter["[p_tag]"]["[N]_dx"] ? avg_meter["[p_tag]"]["[N]_dx"] / avg_meter["[p_tag]"]["cnt"] : 0)
 					avg["[N]_d2x"] = (avg_meter["[p_tag]"]["[N]_d2x"] ? avg_meter["[p_tag]"]["[N]_d2x"] / (avg_meter["[p_tag]"]["cnt"] - 1) : 0)
 
@@ -1475,7 +1483,7 @@
 	var/datum/tag/css/kstyle = new
 	var/datum/tag/meta = new("meta")
 
-//<meta http-equiv='X-UA-Compatible' content='IE=edge'/> 
+//<meta http-equiv='X-UA-Compatible' content='IE=edge'/>
 	meta.setAttribute("http-equiv", "X-UA-Compatible")
 	meta.setAttribute("content", "IE=edge")
 	meta.selfCloses = 1
@@ -1578,7 +1586,7 @@
 	.offline {
         font-size: 2em;
         background-color: #98724C;
-        color:#E4DC8C;   
+        color:#E4DC8C;
     }
 	.stats_tables {
 		margin-top: 100px;
@@ -1640,4 +1648,10 @@
 		src.curpage = text2num(href_list["nav_h"])
 	else if(href_list["avg_reset"])
 		avg_reset()
+	else if(href_list["refresh_toggle"])
+		if(refresh)
+			refresh = 0
+		else
+			refresh = 1
+
 	src.updateUsrDialog()
